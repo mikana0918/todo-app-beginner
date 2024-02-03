@@ -37,4 +37,28 @@ class TodoControllerTest extends TestCase
             'is_completed' => false,
         ]);
     }
+
+    public function test_create_todo(): void
+    {
+        $response = $this->post('/api/todos', [
+            'title' => 'New Todo',
+            'is_completed' => false,
+        ]);
+
+        $response->assertStatus(200)->assertJsonFragment([
+            'title' => 'New Todo',
+            'is_completed' => false,
+        ]);
+    }
+
+    public function test_delete_todo(): void
+    {
+        $todo = Todo::factory()->create();
+
+        $response = $this->delete("/api/todos/{$todo->id}");
+
+        $response->assertStatus(200)->assertJsonFragment([
+            'message' => 'Todo deleted successfully',
+        ]);
+    }
 }
