@@ -1,0 +1,43 @@
+version: '3'
+services:
+    # FastCGI Component ################################################
+    php-fpm:
+        build: ./Docker/php-fpm
+        volumes:
+            - ".:/var/www/laravel-v10-starter:cached"
+        expose:
+            - "9000"
+        depends_on:
+            - db-core
+    # Core DB Component ################################################
+    db-core:
+        build: ./Docker/mysql
+        environment:
+            - MYSQL_USER=local
+            - MYSQL_PASSWORD=local
+            - MYSQL_ROOT_PASSWORD=root
+            - TZ=UTC
+        volumes:
+            - .data/mysql:/var/lib/mysql
+            - ./Docker/mysql/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+        ports:
+            - "3309:3306"
+    # Reverse Proxy Component ################################################
+    nginx:
+        build:
+            context: ./Docker/nginx
+            dockerfile: Dockerfile
+            args:
+                PHP_UPSTREAM_CONTAINER: php-fpm
+                PHP_UPSTREAM_PORT: 9000
+        volumes:
+            - "./storage:/var/www/laravel-v10-starter/storage:cached"
+            - "./public:/var/www/laravel-v10-starter/public:cached"
+            - "./Docker/nginx/sites/:/etc/nginx/sites-available"
+        ports:
+            - "80:80"
+            - "8080:8080"
+            - "8888:8888"
+            - "443:443"
+        depends_on:
+            - php-fpm

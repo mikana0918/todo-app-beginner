@@ -1,0 +1,37 @@
+name: test_php
+
+on: [push]
+jobs:
+  test:
+    name: Test With PHPUnit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2.6'
+    #   - name: Setup Testing Containers
+    #     env:
+    #       DEFAULT_REGION: ap-northeast-1
+    #       AWS_ACCOUNT_ID: "000000000000"
+    #       AWS_ACCESS_KEY_ID: dummy-access-key
+    #       AWS_SECRET_ACCESS_KEY: dummy-secret-key
+    #     run: |
+    #       docker-compose -f docker-compose.ci.yml up -d
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Install Dependencies
+        run: composer install -o
+      - name: Generate key
+        run: php artisan key:generate
+      - name: Create Database
+        run: |
+          mkdir -p database
+          touch database/database.sqlite
+      - name: Execute tests (Unit and Feature tests) via PHPUnit
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan test --env=testing.ci
