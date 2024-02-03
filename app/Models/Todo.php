@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+
+/**
+ * @property int $id
+ * @property string $title
+ * @property bool $is_completed
+ */
 class Todo
 {
-    public int $id;
-    public string $title;
-    public bool $is_completed;
-    public string $created_at;
-    public string $updated_at;
-
     /**
      * @var array<int, string>
      */
@@ -23,6 +24,8 @@ class Todo
      */
     protected $casts = [
         'is_completed' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 }
 
