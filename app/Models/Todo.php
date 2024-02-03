@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use Database\Factories\TodoFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id
  * @property string $title
  * @property bool $is_completed
  */
-class Todo
+class Todo extends Model
 {
+    use HasFactory;
+
     /**
      * @var array<int, string>
      */
@@ -27,6 +31,14 @@ class Todo
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+     
+    /**
+     * Create a new factory instance for the model.
+     */
+    protected static function newFactory() 
+    {
+        return TodoFactory::new();
+    }
 }
 
 
